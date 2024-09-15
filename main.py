@@ -27,4 +27,4 @@ def generate(data: dict):
     return create_prompt(data["user_description"], data["name"], data["data"])
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=80)
+    uvicorn.run(app, host="0.0.0.0", port=3000)
