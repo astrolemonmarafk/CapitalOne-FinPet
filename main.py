@@ -1,19 +1,10 @@
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
-from typing import List
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
-app = FastAPI()
-
-# Allow all origins (for development purposes)
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins
-    allow_credentials=True,
-    allow_methods=["*"],  # Allow all methods
-    allow_headers=["*"],  # Allow all headers
-)
-
+import uvicorn
+from ai.zeroshot import zeroshot_classification
+from ai.personality import create_prompt
+from pydantic import BaseModel
+from typing import List, Dict
 
 class PetPersonalityData(BaseModel):
     Personality: List[str]
@@ -27,28 +18,35 @@ class RequestBody(BaseModel):
     name: str
     data: PetPersonalityData
 
+class ZeroshotRequest(BaseModel):
+    product: str
+    cost: int
+    job: str
+    salary: int
+    hobbies: str
+
+app = FastAPI()
+
+@app.post("/petpersonality")
+def generate(request: RequestBody):
+    data_dict = request.data.dict()  # Convert Pydantic model to dictionary
+    return create_prompt(request.description, request.name, data_dict)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
 
 @app.post("/zeroshot")
-def predict(cost, job, salary, hobbies):
-    return zeroshot_classification(cost, job, salary, hobbies)
-
-
-@app.post("/petpersonality")
-def generate(request: RequestBody):
-    try:
-        description = request.description
-        name = request.name
-        data = request.data.dict()
-
-        response_text = create_prompt(description, name, data)
-        return {"response": response_text}
-    except KeyError as e:
-        raise HTTPException(status_code=400, detail=f"KeyError: {str(e)}")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
+def predict(request: ZeroshotRequest) -> Dict:
+    return zeroshot_classification(request.product, request.cost, request.job, request.salary, request.hobbies)
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0")
