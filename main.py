@@ -23,7 +23,7 @@ def predict(cost, job, salary, hobbies):
     return zeroshot_classification(cost, job, salary, hobbies)
 
 @app.post("/petpersonality")
-def generate(description, name, data):
+def generate(description: str, name: str, data: dict):
     return create_prompt(description, name, data)
 
 if __name__ == "__main__":
