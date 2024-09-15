@@ -1,5 +1,8 @@
-Flask
+uvicorn
+fastapi
 firebase-admin
 pymongo
 requests
-g wrangler
+wrangler
+requests
+python-dotenv

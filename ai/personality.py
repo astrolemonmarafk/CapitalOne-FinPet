@@ -25,7 +25,7 @@ def fav_saying(personality, data):
     phrase = data[data['Personality'] == personality]['Favorite Saying'].tolist()
     return random.choice(phrase)
 
-#MODEL
+# MODEL
 pet_model = "@hf/mistral/mistral-7b-instruct-v0.2"
 API_BASE_URL = f"https://api.cloudflare.com/client/v4/accounts/{count_id}/ai/run/"
 
@@ -46,18 +46,27 @@ def run(model, inputs):
         print(f"An error occurred: {e}")
         return None
 
-print(" Legend has it that many years ago, humans were born with their own companion creature to accompany them on their journey through life; as humans care for it, the creature grows. What is the personality of your dream companion? (Describe it: personality, etc.)")
-user_pet = (str(input()))
-name = (str(input("Name: ")))
+def create_prompt(user_description, name, data):
+    personality = find_personality(user_description, data)
+    fav_phrase = fav_saying(personality, data)
+    user_pet_description = user_description + " " + fav_phrase
 
-match = find_personality(user_pet, preprocessed_data)
-fav_phrase = fav_saying(match, preprocessed_data)
-user_pet = user_pet + fav_phrase
+    prompt = f"Act as if you are the pet with the personality: {personality}. Your name is {name}. Do not mention that you are an AI or that you are not real. Simply respond as if you've just been born. Keep your response within 30 tokens and complete your sentence."
 
-my_prompt = f"Act as if you are the pet with the personality: {match}. Your name is {name}. Do not mention that you are an AI or that you are not real. Simply respond as if youve just been born. Keep your response within 30 tokens and complete your sentence."
+    inputs = [
+        {"role": "system", "content": prompt},
+        {"role": "user", "content": user_pet_description}
+    ]
+    return inputs
 
-inputs = [
-    { "role": "system", "content": f"{my_prompt}" },
-    { "role": "user", "content": f"{user_pet}" }
-]
-output = run(pet_model, inputs)
+def main():
+    print("Legend has it that many years ago, humans were born with their own companion creature to accompany them on their journey through life; as humans care for it, the creature grows. What is the personality of your dream companion? (Describe it: personality, etc.)")
+    user_description = str(input())
+    name = str(input("Name: "))
+
+    inputs = create_prompt(user_description, name, preprocessed_data)
+    output = run(pet_model, inputs)
+    print(output)
+
+if __name__ == "__main__":
+    main()
