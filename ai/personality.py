@@ -1,13 +1,26 @@
+import os
 import requests
 import pandas as pd
 import random
-from keys import *
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 # DATASET STUFF
-file_path = r'ai\datasetai.csv'
-data = pd.read_csv(file_path)
+file_path = os.path.join(os.path.dirname(__file__), 'datasetai.csv')
+try:
+    data = pd.read_csv(file_path)
+except FileNotFoundError:
+    print("The file 'datasetai.csv' was not found.")
+    exit()
+except pd.errors.EmptyDataError:
+    print("The file 'datasetai.csv' is empty.")
+    exit()
+except pd.errors.ParserError:
+    print("Error parsing the file 'datasetai.csv'.")
+    exit()
+
+count_id = "f4890389cdc1dd5005eafe76b069ec85"
+workers_key = 'Bearer 8ZMfDXqje9krSJJHLoGUctzMz_KMiWKLQt5gw--u'
 
 def preprocess_data(df):
     return df[['Personality', 'Catchphrase', 'Favorite Saying', 'Style 1', 'Style 2']]
