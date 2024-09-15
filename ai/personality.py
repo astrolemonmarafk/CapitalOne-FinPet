@@ -1,3 +1,5 @@
+import os
+from dotenv import load_dotenv
 import requests
 import pandas as pd
 import random
@@ -5,9 +7,24 @@ from keys import *
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
+load_dotenv()
+
+count_id = os.getenv("CLOUDFLARE_ACCOUNT_ID")
+workers_key = f"Bearer {os.getenv('CLOUDFLARE_API_KEY')}"
+
 # DATASET STUFF
 file_path = r'db\datasetai.csv'
-data = pd.read_csv(file_path)
+try:
+    data = pd.read_csv(file_path)
+except FileNotFoundError:
+    print("The file 'datasetai.csv' was not found.")
+    exit()
+except pd.errors.EmptyDataError:
+    print("The file 'datasetai.csv' is empty.")
+    exit()
+except pd.errors.ParserError:
+    print("Error parsing the file 'datasetai.csv'.")
+    exit()
 
 def preprocess_data(df):
     return df[['Personality', 'Catchphrase', 'Favorite Saying', 'Style 1', 'Style 2']]
@@ -45,19 +62,24 @@ def run(model, inputs):
     except requests.exceptions.RequestException as e:
         print(f"An error occurred: {e}")
         return None
+    
+def prompt(description, name, data):
+    match = find_personality(description, data)
+    fav_phrase = fav_saying(match, data)
+    user_pet = description + fav_phrase
 
-print(" Legend has it that many years ago, humans were born with their own companion creature to accompany them on their journey through life; as humans care for it, the creature grows. What is the personality of your dream companion? (Describe it: personality, etc.)")
-user_pet = (str(input()))
-name = (str(input("Name: ")))
+    prompt = f"Act as if you are the pet with the personality: {match}. Your name is {name}. Do not mention that you are an AI or that you are not real. Simply respond as if youve just been born. Keep your response within 30 tokens and complete your sentence."
 
-match = find_personality(user_pet, preprocessed_data)
-fav_phrase = fav_saying(match, preprocessed_data)
-user_pet = user_pet + fav_phrase
 
-my_prompt = f"Act as if you are the pet with the personality: {match}. Your name is {name}. Do not mention that you are an AI or that you are not real. Simply respond as if youve just been born. Keep your response within 30 tokens and complete your sentence."
+def main(description, name, data):
+    prompt = prompt(description, name, data)
+    user_pet = input("You are a pet. What is your name? ")
+    inputs = [
+        { "role": "system", "content": f"{prompt}" },
+        { "role": "user", "content": f"{user_pet}" }
+    ]
+    output = run(pet_model, inputs)
+    return output
 
-inputs = [
-    { "role": "system", "content": f"{my_prompt}" },
-    { "role": "user", "content": f"{user_pet}" }
-]
-output = run(pet_model, inputs)
+if __name__ == "__main__":
+    main()
