@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
-import zeroshot_classification from ai.zeroshot
-import create_prompt from ai.personality
+from ai.zeroshot import zeroshot_classification
+from ai.personality import create_prompt
 
 app = FastAPI()
 
