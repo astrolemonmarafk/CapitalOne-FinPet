@@ -123,6 +123,18 @@ def def_pet_bdy():
     output = run("@hf/mistral/mistral-7b-instruct-v0.2", inputs)
     return jsonify({"response": output}), 200
 
+from ai.zeroshot import zeroshot_classification
+@app.route('/get_transaction_classification', methods=['POST'])
+def get_transaction_classification():
+    data = request.json
+    product = data.get('product', '')
+    cost = data.get('cost', '')
+    job = data.get('job', '')
+    salary = data.get('salary', '')
+    hobbies = data.get('hobbies', '')
+
+    result = zeroshot_classification(product, cost, job, salary, hobbies)
+    return jsonify({"classification": result}), 200
 
 # Run the Flask app
 if __name__ == '__main__':
