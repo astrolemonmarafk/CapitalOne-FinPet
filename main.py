@@ -19,12 +19,12 @@ def read_root():
     return {"Hello": "World"}
 
 @app.post("/zeroshot")
-def predict(data: dict):
-    return zeroshot_classification(data["cost"], data["job"], data["salary"], data["hobbies"])
+def predict(cost, job, salary, hobbies):
+    return zeroshot_classification(cost, job, salary, hobbies)
 
 @app.post("/petpersonality")
-def generate(data: dict):
-    return create_prompt(data["description"], data["name"], data["data"])
+def generate(description, name, data):
+    return create_prompt(description, name, data)
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0")
