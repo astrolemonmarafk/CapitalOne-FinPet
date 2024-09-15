@@ -66,14 +66,13 @@ def run(model, inputs):
 def prompt(description, name, data):
     match = find_personality(description, data)
     fav_phrase = fav_saying(match, data)
-    user_pet = description + fav_phrase
-
+    user_pet = match + fav_phrase
     prompt = f"Act as if you are the pet with the personality: {match}. Your name is {name}. Do not mention that you are an AI or that you are not real. Simply respond as if youve just been born. Keep your response within 30 tokens and complete your sentence."
-
+    return prompt
 
 def main(description, name, data):
+    global user_pet
     prompt = prompt(description, name, data)
-    user_pet = input("You are a pet. What is your name? ")
     inputs = [
         { "role": "system", "content": f"{prompt}" },
         { "role": "user", "content": f"{user_pet}" }
