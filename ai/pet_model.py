@@ -3,7 +3,6 @@ from dotenv import load_dotenv
 import requests
 import pandas as pd
 import random
-from keys import *
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
@@ -26,9 +25,9 @@ except pd.errors.ParserError:
     print("Error parsing the file 'datasetai.csv'.")
     exit()
 
-def preprocess_data(df):
+def pre_data(df):
     return df[['Personality', 'Catchphrase', 'Favorite Saying', 'Style 1', 'Style 2']]
-preprocessed_data = preprocess_data(data)
+preprocessed_data = pre_data(data)
 
 def find_personality(user_description, data):
     vectorizer = TfidfVectorizer()

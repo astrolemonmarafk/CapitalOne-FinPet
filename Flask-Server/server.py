@@ -106,6 +106,24 @@ def create_app(test_config=None ):
         return response
 
 
+from ai.pet_model import prompt, run, pre_data
+@app.route('/get_pet_response', methods=['POST'])
+
+def def_pet_bdy():
+    data = request.json
+    description = data.get('description', '')
+    name = data.get('name', '')
+
+    prompt_text = prompt(description, name, pre_data)
+    inputs = [
+        {"role": "system", "content": f"{prompt_text}"},
+        {"role": "user", "content": f"{description}"}
+    ]
+    
+    output = run("@hf/mistral/mistral-7b-instruct-v0.2", inputs)
+    return jsonify({"response": output}), 200
+
+
 # Run the Flask app
 if __name__ == '__main__':
     app.run(debug=True, port=3000)

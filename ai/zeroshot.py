@@ -14,7 +14,7 @@ def query(payload):
 def zeroshot_classification(product, cost, job, salary, hobbies):
     output = query({
         "inputs": f"You are tasked with determining whether a transaction is considered an appropiate or irresponsible financial decision. The transaction in question involves purchasing {product} for {cost}, made by a {job} with a {salary} salary and hobbies such as {hobbies}. Keep in mind that not all non-income-generating expenses are inherently bad. Based on this context, classify the transaction.",
-        "parameters": {"candidate_labels": ["good", "bad"]},
+        "parameters": {"candidate_labels": ["Appropiate", "Irresponsible"]},
     })
 
     return output
