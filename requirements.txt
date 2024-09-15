@@ -6,3 +6,4 @@ requests
 wrangler
 requests
 python-dotenv
+pandas
