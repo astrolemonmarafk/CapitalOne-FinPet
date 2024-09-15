@@ -7,4 +7,4 @@ wrangler
 requests
 python-dotenv
 pandas
-sklearn
+scikit-learn
