@@ -5,7 +5,7 @@ from ai.zeroshot import zeroshot_classification
 from ai.personality import create_prompt
 
 from pydantic import BaseModel
-from typing import Dict, List
+from typing import List, Dict
 
 class PetPersonalityData(BaseModel):
     Personality: List[str]
@@ -41,5 +41,6 @@ def predict(cost, job, salary, hobbies):
 def generate(request: RequestBody):
     data_dict = request.data.dict()  # Convert Pydantic model to dictionary
     return create_prompt(request.description, request.name, data_dict)
+
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0")
