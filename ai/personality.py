@@ -4,6 +4,10 @@ import pandas as pd
 import random
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+from dotenv import load_dotenv
+
+load_dotenv()
+
 
 # DATASET STUFF
 file_path = os.path.join(os.path.dirname(__file__), 'datasetai.csv')
@@ -19,8 +23,8 @@ except pd.errors.ParserError:
     print("Error parsing the file 'datasetai.csv'.")
     exit()
 
-count_id = "f4890389cdc1dd5005eafe76b069ec85"
-workers_key = 'Bearer 8ZMfDXqje9krSJJHLoGUctzMz_KMiWKLQt5gw--u'
+count_id = os.getenv('CLOUDFLARE_ACCOUNT_ID')
+workers_key = f"Bearer {os.getenv('CLOUDFLARE_API_KEY')}"
 
 def preprocess_data(df):
     return df[['Personality', 'Catchphrase', 'Favorite Saying', 'Style 1', 'Style 2']]
@@ -57,8 +61,8 @@ def run(model, inputs):
     try:
         response = requests.post(f"{API_BASE_URL}{model}", headers=headers, json=input_data)
         response.raise_for_status()
-        print(f"Status code: {response.status_code}")
-        print(f"Response text: {response.text}")
+        #print(f"Status code: {response.status_code}")
+        #print(f"Response text: {response.text}")
         return response.json()
     except requests.exceptions.RequestException as e:
         print(f"An error occurred: {e}")
@@ -77,14 +81,11 @@ def create_prompt(description, name, data):
     ]
     return inputs
 
-def main():
-    print("Legend has it that many years ago, humans were born with their own companion creature to accompany them on their journey through life; as humans care for it, the creature grows. What is the personality of your dream companion? (Describe it: personality, etc.)")
-    description = str(input())
-    name = str(input("Name: "))
-
+def main(description, name):
+    #print("Legend has it that many years ago, humans were born with their own companion creature to accompany them on their journey through life; as humans care for it, the creature grows. What is the personality of your dream companion? (Describe it: personality, etc.)")
     inputs = create_prompt(description, name, preprocessed_data)
     output = run(pet_model, inputs)
-    print(output)
+    return output
 
 if __name__ == "__main__":
     main()
