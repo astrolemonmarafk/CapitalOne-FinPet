@@ -24,7 +24,7 @@ def predict(data: dict):
 
 @app.post("/petpersonality")
 def generate(data: dict):
-    return create_prompt(data["user_description"], data["name"], data["data"])
+    return create_prompt(data["description"], data["name"], data["data"])
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0")

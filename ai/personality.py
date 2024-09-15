@@ -26,9 +26,9 @@ def preprocess_data(df):
     return df[['Personality', 'Catchphrase', 'Favorite Saying', 'Style 1', 'Style 2']]
 preprocessed_data = preprocess_data(data)
 
-def find_personality(user_description, data):
+def find_personality(description, data):
     vectorizer = TfidfVectorizer()
-    combined_texts = data['Personality'].tolist() + [user_description]
+    combined_texts = data['Personality'].tolist() + [description]
     tfidf_matrix = vectorizer.fit_transform(combined_texts)
     cosine_sim = cosine_similarity(tfidf_matrix[-1], tfidf_matrix[:-1])
     closest_index = cosine_sim.argmax()
@@ -46,7 +46,7 @@ def run(model, inputs):
     headers = {"Authorization": workers_key}
     input_data = {
         "messages": inputs,
-        "temperature": .9,  # creativity
+        "temperature": .9, 
         "max_tokens": 30
     }
     try:
@@ -59,10 +59,10 @@ def run(model, inputs):
         print(f"An error occurred: {e}")
         return None
 
-def create_prompt(user_description, name, data):
-    personality = find_personality(user_description, data)
+def create_prompt(description, name, data):
+    personality = find_personality(description, data)
     fav_phrase = fav_saying(personality, data)
-    user_pet_description = user_description + " " + fav_phrase
+    user_pet_description = description + " " + fav_phrase
 
     prompt = f"Act as if you are the pet with the personality: {personality}. Your name is {name}. Do not mention that you are an AI or that you are not real. Simply respond as if you've just been born. Keep your response within 30 tokens and complete your sentence."
 
@@ -74,10 +74,10 @@ def create_prompt(user_description, name, data):
 
 def main():
     print("Legend has it that many years ago, humans were born with their own companion creature to accompany them on their journey through life; as humans care for it, the creature grows. What is the personality of your dream companion? (Describe it: personality, etc.)")
-    user_description = str(input())
+    description = str(input())
     name = str(input("Name: "))
 
-    inputs = create_prompt(user_description, name, preprocessed_data)
+    inputs = create_prompt(description, name, preprocessed_data)
     output = run(pet_model, inputs)
     print(output)
 
