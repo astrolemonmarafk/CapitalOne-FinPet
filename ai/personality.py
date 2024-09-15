@@ -28,11 +28,16 @@ preprocessed_data = preprocess_data(data)
 
 def find_personality(description, data):
     vectorizer = TfidfVectorizer()
-    combined_texts = data['Personality'].tolist() + [description]
+    # Ensure 'Personality' exists in data and is a list
+    if 'Personality' in data and isinstance(data['Personality'], list):
+        combined_texts = data['Personality'] + [description]
+    else:
+        raise ValueError("'Personality' key is missing or is not a list in data")
+
     tfidf_matrix = vectorizer.fit_transform(combined_texts)
     cosine_sim = cosine_similarity(tfidf_matrix[-1], tfidf_matrix[:-1])
     closest_index = cosine_sim.argmax()
-    return data.iloc[closest_index]['Personality']
+    return data['Personality'][closest_index]
 
 def fav_saying(personality, data):
     phrase = data[data['Personality'] == personality]['Favorite Saying'].tolist()
